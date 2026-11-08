@@ -31,8 +31,13 @@ def main():
     print(f"正在通过 {args.interface} 等待 Go2 状态……", flush=True)
     ticks = []
     try:
-        for index in range(5): # 采样5次
+        for index in range(50): # 采样5次
             state = sub.Read(5) # 最多等待5s,有消息就返回，不需要一定5s
+
+            # 输出看state类型
+            print(f"state type={type(state)}")
+            # print(f"state={state}")
+
             if state is None:
                 print("等待 5 秒未收到状态帧，请检查网卡和 DDS 连接。")
                 return 1
@@ -47,6 +52,7 @@ def main():
 
     # 只要有一对出现“后一个小于或等于前一个”，程序就提示你检查。
     # 五次都递增，说明这次短实验里读到了持续更新的状态。
+    # any()函数逐项检查 b <= a 是否为为True
     if any(b <= a for a, b in zip(ticks, ticks[1:])):
         print("已收到五帧，但 tick 未持续递增。")
         return 1
@@ -55,4 +61,4 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main()) # SystemExit会依据main返回的退出码执行(1 正常运行， 0 报错了)
